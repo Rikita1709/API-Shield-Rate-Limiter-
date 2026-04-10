@@ -1,0 +1,11 @@
+{
+	"folders": [
+		{
+			"path": "../api-shield-frontend"
+		},
+		{
+			"path": "../api-shield-backend"
+		}
+	],
+	"settings": {}
+}
