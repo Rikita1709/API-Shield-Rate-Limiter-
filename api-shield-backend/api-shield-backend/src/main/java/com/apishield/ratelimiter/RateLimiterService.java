@@ -22,13 +22,13 @@ private long timeWindow;
 
         timestamps.putIfAbsent(apiKey, currentTime);
 
-        if (currentTime - timestamps.get(apiKey) > TIME_WINDOW) {
+       if (currentTime - timestamps.get(apiKey) > timeWindow){
             requestCounts.put(apiKey, 0);
             timestamps.put(apiKey, currentTime);
         }
 
         requestCounts.put(apiKey, requestCounts.getOrDefault(apiKey, 0) + 1);
 
-        return requestCounts.get(apiKey) <= LIMIT;
+        return requestCounts.get(apiKey) <= limit;
     }
 }
