@@ -2,7 +2,7 @@ package com.apishield.ratelimiter;
 
 import java.util.HashMap;
 import java.util.Map;
-
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -10,9 +10,11 @@ public class RateLimiterService {
 
 private final Map<String, Integer> requestCounts = new ConcurrentHashMap<>();
 private final Map<String, Long> timestamps = new ConcurrentHashMap<>();
+@Value("${rate.limit}")
+private int limit;
 
-    private static final int LIMIT = 5;
-    private static final long TIME_WINDOW = 60000; // 1 minute
+@Value("${rate.window}")
+private long timeWindow;
 
     public boolean isAllowed(String apiKey) {
 
