@@ -27,17 +27,22 @@ public class RateLimiterService {
     public boolean isAllowed(String apiKey) {
 
         statisticsService.incrementTotal();
+        statisticsService.incrementApiKeyRequests(apiKey);
 
         long currentTime = System.currentTimeMillis();
 
+        // Initialize for first-time API key
         timestamps.putIfAbsent(apiKey, currentTime);
+        requestCounts.putIfAbsent(apiKey, 0);
 
+        // Reset window if expired
         if (currentTime - timestamps.get(apiKey) > timeWindow) {
             requestCounts.put(apiKey, 0);
             timestamps.put(apiKey, currentTime);
         }
 
-        requestCounts.put(apiKey, requestCounts.getOrDefault(apiKey, 0) + 1);
+        // Count current request
+        requestCounts.put(apiKey, requestCounts.get(apiKey) + 1);
 
         boolean allowed = requestCounts.get(apiKey) <= limit;
 

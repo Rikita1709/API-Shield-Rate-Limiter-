@@ -1,8 +1,5 @@
 package com.apishield.controller;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -56,19 +53,12 @@ public class TestController {
     }
 
     @GetMapping("/api/stats")
-    public Map<String, Integer> getStats() {
+    public Object getStats() {
+        return statisticsService.getStats();
+    }
 
-        Map<String, Integer> stats = new HashMap<>();
-
-        stats.put("totalRequests",
-                statisticsService.getTotalRequests());
-
-        stats.put("allowedRequests",
-                statisticsService.getAllowedRequests());
-
-        stats.put("blockedRequests",
-                statisticsService.getBlockedRequests());
-
-        return stats;
+    @GetMapping("/api/stats/api-keys")
+    public Object getApiKeyStats() {
+        return statisticsService.getApiKeyRequests();
     }
 }
