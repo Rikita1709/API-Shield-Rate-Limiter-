@@ -1,5 +1,7 @@
 package com.apishield.ratelimiter;
 
+import java.util.Deque;
+import java.util.LinkedList;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -12,8 +14,8 @@ import com.apishield.service.StatisticsService;
 @Service
 public class RateLimiterService {
 
-    private final Map<String, Integer> requestCounts = new ConcurrentHashMap<>();
-    private final Map<String, Long> timestamps = new ConcurrentHashMap<>();
+    // Stores request timestamps for each API key
+    private final Map<String, Deque<Long>> requestLogs = new ConcurrentHashMap<>();
 
     @Value("${rate.limit}")
     private int limit;
@@ -31,22 +33,23 @@ public class RateLimiterService {
 
         long currentTime = System.currentTimeMillis();
 
-        // Initialize for first-time API key
-        timestamps.putIfAbsent(apiKey, currentTime);
-        requestCounts.putIfAbsent(apiKey, 0);
+        // Get request history for API key
+        Deque<Long> requests =
+                requestLogs.computeIfAbsent(
+                        apiKey,
+                        k -> new LinkedList<>()
+                );
 
-        // Reset window if expired
-        if (currentTime - timestamps.get(apiKey) > timeWindow) {
-            requestCounts.put(apiKey, 0);
-            timestamps.put(apiKey, currentTime);
+        // Remove requests that are outside the sliding window
+        while (!requests.isEmpty()
+                && currentTime - requests.peekFirst() >= timeWindow) {
+            requests.pollFirst();
         }
 
-        // Count current request
-        requestCounts.put(apiKey, requestCounts.get(apiKey) + 1);
-
-        boolean allowed = requestCounts.get(apiKey) <= limit;
+        boolean allowed = requests.size() < limit;
 
         if (allowed) {
+            requests.addLast(currentTime);
             statisticsService.incrementAllowed();
         } else {
             statisticsService.incrementBlocked();
