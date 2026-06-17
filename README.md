@@ -12,7 +12,7 @@ This project simulates a lightweight **API Gateway-style system** used in real-w
 ## ✨ Features
 
 - 🔑 API Key Authentication
-- 🚦 Fixed Window Rate Limiting
+- 🚦 Sliding Window Rate Limiting
 - ❌ Request Blocking when limit exceeded
 - 📊 Real-time API analytics dashboard
 - 📈 Total / Allowed / Blocked request tracking
